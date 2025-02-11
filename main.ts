@@ -1,20 +1,74 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TFile } from 'obsidian';
+import { PluginSettings, SettingsTab } from './settings/SettingsTab';
+import { matches, transform } from 'regex/Regex';
 
 // Remember to rename these classes and interfaces!
 
-interface MyPluginSettings {
-	mySetting: string;
+const DEFAULT_SETTINGS: PluginSettings = {
+	tableEntries: []
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
-}
-
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+export default class NewFileRenamer extends Plugin {
+	settings: PluginSettings;
 
 	async onload() {
 		await this.loadSettings();
+
+		// This adds a settings tab so the user can configure various aspects of the plugin
+		this.addSettingTab(new SettingsTab(this.app, this));
+
+		this.registerEvent(this.app.vault.on('rename', async (file, oldPath) => {
+			console.log(`File renamed from: ${oldPath} to ${file.path}`);
+
+			/**
+		 	 * THIS IS WHERE THE MAGIC HAPPENS
+			 */
+
+			// Find the first xformation entry that matches the file path
+			const xformEntry = this.settings.tableEntries.find(entry => 
+				matches(file.name, new RegExp(entry.fileNameMatcher))
+			);
+
+			if (xformEntry) {
+				console.log("Pattern match found. Renaming file using the new pattern");
+				// Rename the file using the newFileReplacePattern
+				const newFileName = 
+					transform(file.name, new RegExp(xformEntry.fileNameMatcher), xformEntry.newFileReplacePattern);
+				const newFilePath = file.parent?.path + newFileName;
+				// create a new file and remove the old one, so that the rename event isn't triggered again
+				const newFile = await this.app.vault.create(newFilePath, "");
+				// show the file in the current editor
+				if (newFile) {
+					await this.app.workspace.getLeaf().openFile(newFile);
+				} else {
+					console.log("Error: new file not found: " + newFilePath);
+				}
+				// delete the old file
+				this.app.vault.delete(file, true);
+
+				// Apply the template if there is one
+				if(xformEntry.template) {
+					const template = xformEntry.template;
+					const newFileContent = await this.app.vault.read(newFile);
+					if(newFileContent === "") {
+						const tp = await this.getTemplater();
+						var templateFile = this.app.vault.getFileByPath(template);
+						tp.write_template_to_file(templateFile, newFile);
+						//this.app.vault.modify(newFile, "This is where the new content would go");
+					}
+					else {
+						console.log("File already has content. Not overwriting it: " + newFileContent);
+					}
+				}
+			}
+			else {
+				console.log("No pattern match found. Regular rename proceeding");
+			}
+		}));
+
+		/**
+		 * The code below is from the original sample plugin
+		 */
 
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
@@ -65,9 +119,6 @@ export default class MyPlugin extends Plugin {
 			}
 		});
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
-
 		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
 		// Using this function will automatically remove the event listener when this plugin is disabled.
 		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
@@ -89,6 +140,17 @@ export default class MyPlugin extends Plugin {
 	async saveSettings() {
 		await this.saveData(this.settings);
 	}
+
+	async getTemplater(): Promise<any> {
+        // try to get the Templater folder first
+        const plugins = (this.app as any).plugins;
+		const tp = plugins.getPlugin("templater-obsidian").templater;
+		// if templater is installed
+		if(tp) {
+			return tp;
+		}
+        return undefined;
+    }
 }
 
 class SampleModal extends Modal {
@@ -104,31 +166,5 @@ class SampleModal extends Modal {
 	onClose() {
 		const {contentEl} = this;
 		contentEl.empty();
-	}
-}
-
-class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
-
-	constructor(app: App, plugin: MyPlugin) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
-
-	display(): void {
-		const {containerEl} = this;
-
-		containerEl.empty();
-
-		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
-				.onChange(async (value) => {
-					this.plugin.settings.mySetting = value;
-					await this.plugin.saveSettings();
-				}));
 	}
 }
