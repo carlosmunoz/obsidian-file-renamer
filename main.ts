@@ -1,8 +1,7 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TFile } from 'obsidian';
 import { PluginSettings, SettingsTab } from './settings/SettingsTab';
 import { matches, transform } from 'regex/Regex';
-
-// Remember to rename these classes and interfaces!
+import * as path from 'path';
 
 const DEFAULT_SETTINGS: PluginSettings = {
 	tableEntries: []
@@ -34,7 +33,7 @@ export default class NewFileRenamer extends Plugin {
 				// Rename the file using the newFileReplacePattern
 				const newFileName = 
 					transform(file.name, new RegExp(xformEntry.fileNameMatcher), xformEntry.newFileReplacePattern);
-				const newFilePath = file.parent?.path + newFileName;
+				const newFilePath = file.parent?.path + path.sep + newFileName;
 				// create a new file and remove the old one, so that the rename event isn't triggered again
 				const newFile = await this.app.vault.create(newFilePath, "");
 				// show the file in the current editor
