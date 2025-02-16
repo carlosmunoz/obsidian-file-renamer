@@ -1,4 +1,4 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, TFile } from 'obsidian';
+import { App, Editor, MarkdownView, Modal, Notice, Plugin, TFile } from 'obsidian';
 import { PluginSettings, SettingsTab } from './settings/SettingsTab';
 import { matches, transform } from 'regex/Regex';
 import * as path from 'path';
@@ -17,11 +17,6 @@ export default class NewFileRenamer extends Plugin {
 		this.addSettingTab(new SettingsTab(this.app, this));
 
 		this.registerEvent(this.app.vault.on('rename', async (file, oldPath) => {
-			console.log(`File renamed from: ${oldPath} to ${file.path}`);
-
-			/**
-		 	 * THIS IS WHERE THE MAGIC HAPPENS
-			 */
 
 			// Find the first xformation entry that matches the file path
 			const xformEntry = this.settings.tableEntries.find(entry => 
@@ -29,18 +24,22 @@ export default class NewFileRenamer extends Plugin {
 			);
 
 			if (xformEntry) {
-				console.log("Pattern match found. Renaming file using the new pattern");
 				// Rename the file using the newFileReplacePattern
 				const newFileName = 
 					transform(file.name, new RegExp(xformEntry.fileNameMatcher), xformEntry.newFileReplacePattern);
 				const newFilePath = file.parent?.path + path.sep + newFileName;
+
+				console.log(`File renamer - renaming file: ${file.path} to ${newFilePath}`);
+
+				let previousContent = await this.app.vault.cachedRead(file as TFile);
+
 				// create a new file and remove the old one, so that the rename event isn't triggered again
-				const newFile = await this.app.vault.create(newFilePath, "");
+				const newFile = await this.app.vault.create(newFilePath, previousContent);
 				// show the file in the current editor
 				if (newFile) {
 					await this.app.workspace.getLeaf().openFile(newFile);
 				} else {
-					console.log("Error: new file not found: " + newFilePath);
+					console.log("[ERROR] File renamer - new file not found: " + newFilePath);
 				}
 				// delete the old file
 				this.app.vault.delete(file, true);
@@ -48,15 +47,13 @@ export default class NewFileRenamer extends Plugin {
 				// Apply the template if there is one
 				if(xformEntry.template) {
 					const template = xformEntry.template;
-					const newFileContent = await this.app.vault.read(newFile);
-					if(newFileContent === "") {
+					if(previousContent === "") {
 						const tp = await this.getTemplater();
 						var templateFile = this.app.vault.getFileByPath(template);
 						tp.write_template_to_file(templateFile, newFile);
-						//this.app.vault.modify(newFile, "This is where the new content would go");
 					}
 					else {
-						console.log("File already has content. Not overwriting it: " + newFileContent);
+						new Notice(`${newFile.path} already has content. Not overwriting it.`, 3000);
 					}
 				}
 			}
