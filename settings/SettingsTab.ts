@@ -1,5 +1,6 @@
 import NewFileRenamer from "main";
 import { App, PluginSettingTab, setIcon, Setting, TextComponent, TFile } from "obsidian";
+import { TemplateFileSuggest } from "suggesters/FileSuggester";
 
 export interface PluginSettings {
 	tableEntries: { fileNameMatcher: string; newFileReplacePattern: string, template: string }[];
@@ -17,7 +18,7 @@ export class SettingsTab extends PluginSettingTab {
         const { containerEl } = this;
         containerEl.empty();
 
-        containerEl.createEl("h2", { text: "Table Settings" });
+        containerEl.createEl("h2", { text: "Renaming Rules" });
 
         const table = containerEl.createEl("table");
         table.style.width = "100%";
@@ -25,7 +26,7 @@ export class SettingsTab extends PluginSettingTab {
         const tbody = table.createEl("tbody");
         const headerRow = thead.createEl("tr");
 
-        ["File Name Matcher", "New Name Expression", "Template to Apply", "Actions"].forEach((text) => {
+        ["File Name (Regex)", "New Name (Regex)", "Template to Apply", "Actions"].forEach((text) => {
             const th = headerRow.createEl("th", { text });
             th.style.padding = "8px";
             th.style.borderBottom = "1px solid var(--background-modifier-border)";
@@ -35,7 +36,6 @@ export class SettingsTab extends PluginSettingTab {
             tbody.empty();
             this.plugin.settings.tableEntries.forEach((entry, index) => {
                 const row = tbody.createEl("tr");
-                row.draggable = true;
 
                 // File name matcher field
                 const keyTd = row.createEl("td");
@@ -62,11 +62,8 @@ export class SettingsTab extends PluginSettingTab {
                 templateInput.oninput = () => {
                     this.plugin.settings.tableEntries[index].template = templateInput.value;
                     this.plugin.saveSettings();
-                    this.showTemplateSuggestions(templateInput, templateInput.value, index);
                 };
-                templateInput.onfocus = () => {
-                    this.showTemplateSuggestions(templateInput, templateInput.value, index);
-                };
+                new TemplateFileSuggest(templateInput, this.plugin, this.getTemplatesFolder());
 
                 // Remove button
                 const actionsTd = row.createEl("td");
@@ -126,68 +123,5 @@ export class SettingsTab extends PluginSettingTab {
         // try to get the Templater folder first
         const plugins = (this.app as any).plugins;
         return plugins?.plugins["templater-obsidian"].settings.templates_folder;
-    }
-
-    showTemplateSuggestions(inputEl: HTMLInputElement, value: string, entryIdx: number) {
-        let dropdown = inputEl.nextElementSibling as HTMLDivElement;
-        const templateFolder = this.getTemplatesFolder();
-        let templates = templateFolder ? 
-            this.app.vault.getFolderByPath(templateFolder)?.children
-                .filter(f => f instanceof TFile) 
-                .map(f => f.path)
-            : [];
-
-        if(!templates) {
-            templates = [];
-        }
-        
-        // Remove existing dropdown if it exists
-        if (dropdown && dropdown.classList.contains("suggestion-dropdown")) {
-            dropdown.remove();
-        }
-
-        // Filter suggestions based on user input
-        const filteredSuggestions = templates.filter((s) => 
-            s.toLowerCase().includes(value.toLowerCase())
-        );
-
-        if (filteredSuggestions.length === 0) return;
-
-        // Create dropdown
-        dropdown = document.createElement("div");
-        dropdown.classList.add("suggestion-dropdown");
-        dropdown.style.position = "absolute";
-        dropdown.style.backgroundColor = "var(--background-primary)";
-        dropdown.style.border = "1px solid var(--background-modifier-border)";
-        dropdown.style.padding = "5px";
-        dropdown.style.width = `${inputEl.offsetWidth}px`;
-        dropdown.style.zIndex = "1000";
-
-        filteredSuggestions.forEach((suggestion) => {
-            const item = document.createElement("div");
-            item.classList.add("suggestion-item");
-            item.textContent = suggestion;
-            item.style.padding = "5px";
-            item.style.cursor = "pointer";
-
-            item.addEventListener("click", async () => {
-                inputEl.value = suggestion;
-                this.plugin.settings.tableEntries[entryIdx].template = suggestion;
-                await this.plugin.saveSettings();
-                dropdown.remove();
-            });
-
-            item.addEventListener("mouseover", () => {
-                item.style.backgroundColor = "var(--background-modifier-hover)";
-            });
-
-            item.addEventListener("mouseout", () => {
-                item.style.backgroundColor = "transparent";
-            });
-
-            dropdown.appendChild(item);
-        });
-
-        inputEl.parentElement?.appendChild(dropdown);
     }
 }
