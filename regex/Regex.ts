@@ -30,7 +30,7 @@ export const transform = (input: string, matchRegex: RegExp, replacementPattern:
         if(matchIdx && matchIndex.has(parseInt(matchIdx))) {
             return matchIndex.get(parseInt(matchIdx)) || "";
         }
-        return `<pos-arg not found in original reg-exp: ${matchIdx}>`;
+        return `\$${matchIdx}`; // Return the same match index if not found
     });
 
     // Replace named arguments
@@ -39,7 +39,7 @@ export const transform = (input: string, matchRegex: RegExp, replacementPattern:
         if(matchIdx && matchIndex.has(matchIdx)) {
             return matchIndex.get(matchIdx) || "";
         }
-        return `<named-arg not found in original reg-exp: ${matchIdx}>`;
+        return `\$${matchIdx}`; // Return the same match index if not found
     });
 
     return xformedName;
