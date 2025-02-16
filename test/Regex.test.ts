@@ -66,4 +66,16 @@ describe("Regular Expression tests", () => {
         
         expect(transform("Prefix-12345-and_some_text.md", fileNameMatcher, "$core-$1.md")).toBe("and_some_text-12345.md");
     });
+
+    test("Positional arguments not found", () => {
+        const fileNameMatcher = /Prefix-(.*)\.md/;
+        
+        expect(transform("Prefix-Suffix.md", fileNameMatcher, "$1-$2.md")).toBe("Suffix-$2.md");
+    });
+
+    test("Named group not found", () => {
+        const fileNameMatcher = /Prefix-(.*)\.md/;
+        
+        expect(transform("Prefix-Suffix.md", fileNameMatcher, "$1-$group.md")).toBe("Suffix-$group.md");
+    });
 });
