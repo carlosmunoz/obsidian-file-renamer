@@ -31,7 +31,8 @@ export default class NewFileRenamer extends Plugin {
 
 				console.log(`File renamer - renaming file: ${file.path} to ${newFilePath}`);
 
-				let previousContent = await this.app.vault.cachedRead(file as TFile);
+				const previousContent = 
+					file instanceof TFile ? await this.app.vault.cachedRead(file) : "";
 
 				// create a new file and remove the old one, so that the rename event isn't triggered again
 				const newFile = await this.app.vault.create(newFilePath, previousContent);

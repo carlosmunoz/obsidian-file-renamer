@@ -26,7 +26,6 @@ export class TemplateFileSuggest extends TextInputSuggest<TFile> {
                 .map(f => f as TFile)
                 .filter(f => f.extension === "md")
                 .filter(f => f.path.toLowerCase().contains(input_str.toLowerCase()));
-                //.map(f => f.path)
 
         return templateFiles ? templateFiles.slice(0, 1000) : [];
     }
