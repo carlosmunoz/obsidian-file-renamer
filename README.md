@@ -1,4 +1,7 @@
 # Obsidian File Renamer Plugin
+
+[![Build Status](https://github.com/carlosmunoz/obsidian-file-renamer/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/carlosmunoz/obsidian-file-renamer/actions/workflows/build.yml)
+
 This plugin is aimed at automating the renaming of files and applying templates by recognizing file name patterns. I works by customizing regular expressions that are matched against file names, renaming the file using a separate pattern, and optionally applying an indicated template
 
 ## Motivation
