@@ -1,9 +1,9 @@
 {
-	"id": "obsidian-file-renamer",
+	"id": "file-renamer",
 	"name": "File Renamer",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "Automates the renaming of files in Obsidian.",
+	"description": "Automates the renaming of files and template use based on regular expressions",
 	"author": "Carlos Muñoz",
 	"authorUrl": "https://github.com/carlosmunoz",
 	"isDesktopOnly": false
