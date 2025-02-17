@@ -1,11 +1,10 @@
 {
-	"id": "obsidian-new-file-renamer",
-	"name": "New File Renamer",
-	"version": "0.1.0",
+	"id": "obsidian-file-renamer",
+	"name": "File Renamer",
+	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "Automates the renaming of new files in Obsidian.",
+	"description": "Automates the renaming of files in Obsidian.",
 	"author": "Carlos Muñoz",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"authorUrl": "https://github.com/carlosmunoz",
 	"isDesktopOnly": false
 }
