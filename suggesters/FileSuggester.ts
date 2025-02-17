@@ -23,6 +23,7 @@ export class TemplateFileSuggest extends TextInputSuggest<TFile> {
         let templateFiles =
             this.app.vault.getFolderByPath(this.rootFolder)?.children
                 .filter(f => f instanceof TFile)
+                .map(f => f as TFile)
                 .filter(f => f.extension === "md")
                 .filter(f => f.path.toLowerCase().contains(input_str.toLowerCase()));
                 //.map(f => f.path)
