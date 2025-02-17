@@ -30,7 +30,7 @@ Quickly create a meeting note.
 | New Name (Regex)  | `Meeting - $1.md`           |
 | Template to Apply | `Templates/Meeting Note.md` |
 
-## Plugin behavior
+### Plugin behavior
 ![](images/example1.gif)
 
 ## Quick notes
@@ -46,7 +46,7 @@ This example uses a named capture group.
 | New Name (Regex)  | `[Quick Note] $name.md`     |
 | Template to Apply | `Templates/Quick Note.md`   |
 
-## Plugin behavior
+### Plugin behavior
 ![](images/example2.gif)
 
 
