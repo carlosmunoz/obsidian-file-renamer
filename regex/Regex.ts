@@ -24,9 +24,8 @@ export const transform = (input: string, matchRegex: RegExp, replacementPattern:
     }
 
     // Replace positional arguments
-    var groupCount = matchIndex.size-1;
-    var xformedName = replacementPattern.replace(/\$(\d+)/g, (match, ...args) => {        
-        var matchIdx = args[0];
+    let xformedName = replacementPattern.replace(/\$(\d+)/g, (match, ...args) => {        
+        const matchIdx = args[0];
         if(matchIdx && matchIndex.has(parseInt(matchIdx))) {
             return matchIndex.get(parseInt(matchIdx)) || "";
         }
@@ -35,7 +34,7 @@ export const transform = (input: string, matchRegex: RegExp, replacementPattern:
 
     // Replace named arguments
     xformedName = xformedName.replace(/\$(\w+)/g, (match, ...args) => {
-        var matchIdx = args[0];
+        const matchIdx = args[0];
         if(matchIdx && matchIndex.has(matchIdx)) {
             return matchIndex.get(matchIdx) || "";
         }

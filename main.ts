@@ -50,7 +50,7 @@ export default class NewFileRenamer extends Plugin {
 					const template = xformEntry.template;
 					if(previousContent === "") {
 						const tp = await this.getTemplater();
-						var templateFile = this.app.vault.getFileByPath(template);
+						const templateFile = this.app.vault.getFileByPath(template);
 						tp.write_template_to_file(templateFile, newFile);
 					}
 					else {
