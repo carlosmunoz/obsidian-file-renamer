@@ -24,7 +24,7 @@ Quickly create a meeting note.
 
 ### Rule
 
-| Setting           | Example                     |
+| Setting           | Value                     |
 | ----------------- | --------------------------- |
 | File name (Regex) | `M-(.*).md`                 |
 | New Name (Regex)  | `Meeting - $1.md`           |
@@ -40,7 +40,7 @@ This example uses a named capture group.
 
 ### Rule
 
-| Setting           | Example                     |
+| Setting           | Value                     |
 | ----------------- | --------------------------- |
 | File name (Regex) | `Q-(?<name>.*).md`          |
 | New Name (Regex)  | `[Quick Note] $name.md`     |
