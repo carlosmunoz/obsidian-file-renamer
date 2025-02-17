@@ -53,7 +53,7 @@ export default class NewFileRenamer extends Plugin {
 						tp.write_template_to_file(templateFile, newFile);
 					}
 					else {
-						new Notice(`${newFile.path} already has content. Not overwriting it.`, 3000);
+						new Notice(`${newFile.path} already has content. Not overwriting it.`);
 					}
 				}
 			}
