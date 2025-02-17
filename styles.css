@@ -1,8 +1,12 @@
-/*
+.new-file-renamer-rules-table {
+    width: 100%;
+}
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.new-file-renamer-rules-table th {
+    padding: 8px;
+    border-bottom: 1px solid var(--background-modifier-border);
+}
 
-If your plugin does not need CSS, delete this file.
-
-*/
+.new-file-renamer-rules-table td input[type="text"] {
+    width: 100%;
+}

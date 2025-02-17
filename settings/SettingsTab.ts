@@ -20,16 +20,13 @@ export class SettingsTab extends PluginSettingTab {
 
         containerEl.createEl("h2", { text: "Renaming Rules" });
 
-        const table = containerEl.createEl("table");
-        table.style.width = "100%";
+        const table = containerEl.createEl("table", { cls: "new-file-renamer-rules-table" });
         const thead = table.createEl("thead");
         const tbody = table.createEl("tbody");
         const headerRow = thead.createEl("tr");
 
         ["File Name (Regex)", "New Name (Regex)", "Template to Apply", "Actions"].forEach((text) => {
             const th = headerRow.createEl("th", { text });
-            th.style.padding = "8px";
-            th.style.borderBottom = "1px solid var(--background-modifier-border)";
         });
 
         const updateTable = () => {
@@ -40,7 +37,6 @@ export class SettingsTab extends PluginSettingTab {
                 // File name matcher field
                 const keyTd = row.createEl("td");
                 const keyInput = keyTd.createEl("input", { type: "text", value: entry.fileNameMatcher });
-                keyInput.style.width = "100%";
                 keyInput.oninput = () => {
                     this.plugin.settings.tableEntries[index].fileNameMatcher = keyInput.value;
                     this.plugin.saveSettings();
@@ -49,7 +45,6 @@ export class SettingsTab extends PluginSettingTab {
                 // New file name replacer field
                 const valueTd = row.createEl("td");
                 const fileNameReplacerInput = valueTd.createEl("input", { type: "text", value: entry.newFileReplacePattern });
-                fileNameReplacerInput.style.width = "100%";
                 fileNameReplacerInput.oninput = () => {
                     this.plugin.settings.tableEntries[index].newFileReplacePattern = fileNameReplacerInput.value;
                     this.plugin.saveSettings();
@@ -58,7 +53,6 @@ export class SettingsTab extends PluginSettingTab {
                 // Template to Apply field
                 const templateTd = row.createEl("td");
                 const templateInput = templateTd.createEl("input", { type: "text", value: entry.template });
-                templateInput.style.width = "100%";
                 templateInput.oninput = () => {
                     this.plugin.settings.tableEntries[index].template = templateInput.value;
                     this.plugin.saveSettings();
